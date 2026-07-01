@@ -1,0 +1,9 @@
+results*/
+__pycache__/
+*.pyc
+archive/
+archive.zip
+output.png
+sameinipynb/notebook_outputs/
+sameinipynb/*_executed.ipynb
+sameinipynb/*_executed.html

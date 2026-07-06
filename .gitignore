@@ -7,3 +7,4 @@ output.png
 sameinipynb/notebook_outputs/
 sameinipynb/*_executed.ipynb
 sameinipynb/*_executed.html
+.venv/

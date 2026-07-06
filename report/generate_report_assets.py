@@ -7,7 +7,6 @@ from textwrap import fill
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Rectangle
 
 
@@ -79,8 +78,8 @@ def rounded_box(
     title,
     style,
     body=None,
-    title_size=4.8,
-    body_size=4.0,
+    title_size=10.5,
+    body_size=8.2,
     title_color="#0f172a",
 ):
     fc, ec = STYLES[style]
@@ -97,7 +96,7 @@ def rounded_box(
     ax.add_patch(patch)
     ax.text(
         x + w / 2,
-        y + h - 0.65,
+        y + h - 1.05,
         title,
         ha="center",
         va="top",
@@ -109,7 +108,7 @@ def rounded_box(
     if body:
         ax.text(
             x + 0.35,
-            y + h - 1.75,
+            y + h - 2.95,
             body,
             ha="left",
             va="top",
@@ -133,13 +132,13 @@ def put_image(ax, image, x, y, w, h, label=None, border="#cbd5e1"):
             label,
             ha="center",
             va="top",
-            fontsize=3.8,
+            fontsize=7.2,
             color="#0f172a",
             zorder=4,
         )
 
 
-def put_text(ax, x, y, text, width=25, size=4.2, weight="normal", color="#0f172a"):
+def put_text(ax, x, y, text, width=25, size=8.8, weight="normal", color="#0f172a"):
     wrapped = "\n".join(fill(line, width=width) for line in text.split("\n"))
     ax.text(
         x,
@@ -156,7 +155,7 @@ def put_text(ax, x, y, text, width=25, size=4.2, weight="normal", color="#0f172a
 
 
 def mini_hist(ax, images, labels, colors, x, y, w, h):
-    rounded_box(ax, x, y, w, h, "2.7 Histogram Analysis", "prep", title_size=4.6)
+    rounded_box(ax, x, y, w, h, "2.7 Histogram\nAnalysis", "prep", title_size=9.0)
     for idx, (image, label, color) in enumerate(zip(images, labels, colors)):
         values = image.reshape(-1)
         hist, bins = np.histogram(values, bins=70, range=(0, 255))
@@ -170,7 +169,7 @@ def mini_hist(ax, images, labels, colors, x, y, w, h):
         xs = np.linspace(x0, x1, len(hist))
         ys = y0 + hist * (y1 - y0)
         ax.fill_between(xs, y0, ys, color=color, alpha=0.8, zorder=3)
-        ax.text(x + 0.35, y0 + 0.5, label, ha="left", va="center", fontsize=3.6, zorder=4)
+        ax.text(x + 0.35, y0 + 0.5, label, ha="left", va="center", fontsize=7.2, zorder=4)
 
 
 def branch_letter(method: str) -> str:
@@ -186,19 +185,19 @@ def method_panel(ax, method, x, y, w, h, raw, refined):
         y,
         w,
         h,
-        f"3.{letter} {method.upper()} Thresholding",
+        f"3.{letter} {method.upper()}\nThresholding",
         "threshold",
         body={
             "global": "Percentile threshold on enhanced vessel image.",
             "otsu": "Automatic threshold from intensity distribution.",
             "adaptive": "Local Gaussian threshold for uneven illumination.",
         }[method],
-        title_size=4.6,
-        body_size=3.75,
+        title_size=10.4,
+        body_size=8.0,
         title_color=color,
     )
-    put_image(ax, raw, x + 0.55, y + 0.65, w * 0.38, h * 0.43, "raw mask", color)
-    put_image(ax, refined, x + w * 0.57, y + 0.65, w * 0.38, h * 0.43, "clean mask", color)
+    put_image(ax, raw, x + 0.75, y + 0.8, w * 0.42, h * 0.48, "raw mask", color)
+    put_image(ax, refined, x + w * 0.55, y + 0.8, w * 0.42, h * 0.48, "clean mask", color)
 
 
 def morph_panel(ax, method, x, y, w, h):
@@ -212,7 +211,7 @@ def morph_panel(ax, method, x, y, w, h):
         h,
         f"4.{letter} Morphological Refinement",
         "threshold",
-        title_size=4.4,
+        title_size=10.4,
         title_color=color,
     )
     steps = ["Opening", "Closing", "Fill holes", "Remove small\ncomponents", "Final mask"]
@@ -221,9 +220,9 @@ def morph_panel(ax, method, x, y, w, h):
         sx = x + 0.45 + idx * step_w
         ax.add_patch(
             FancyBboxPatch(
-                (sx, y + 1.35),
+                (sx, y + 2.15),
                 step_w - 0.18,
-                1.25,
+                2.25,
                 boxstyle="round,pad=0.012,rounding_size=0.06",
                 linewidth=0.45,
                 edgecolor=color,
@@ -233,30 +232,30 @@ def morph_panel(ax, method, x, y, w, h):
         )
         ax.text(
             sx + (step_w - 0.18) / 2,
-            y + 1.98,
+            y + 3.28,
             step,
             ha="center",
             va="center",
-            fontsize=3.25,
+            fontsize=7.2,
             color="#0f172a",
             zorder=4,
         )
         if idx < len(steps) - 1:
             arrow(
                 ax,
-                (sx + step_w - 0.18, y + 1.98),
-                (sx + step_w + 0.05, y + 1.98),
+                (sx + step_w - 0.18, y + 3.28),
+                (sx + step_w + 0.05, y + 3.28),
                 color=color,
                 lw=0.55,
                 zorder=3.5,
             )
     ax.text(
         x + w / 2,
-        y + 0.55,
+        y + 0.9,
         "Same refinement is applied after every threshold branch.",
         ha="center",
         va="center",
-        fontsize=3.55,
+        fontsize=7.0,
         color="#334155",
         zorder=4,
     )
@@ -271,31 +270,20 @@ def skeleton_panel(ax, method, x, y, w, h, skeleton):
         y,
         w,
         h,
-        f"5.{letter} Skeleton + Features",
+        f"5.{letter} Skeleton",
         "skeleton",
-        title_size=4.4,
+        title_size=9.4,
         title_color=color,
     )
-    put_image(ax, skeleton, x + 0.55, y + 0.85, w * 0.34, h * 0.5, "skeleton", color)
+    put_image(ax, skeleton, x + 0.75, y + 0.95, w * 0.38, h * 0.56, "skeleton", color)
     put_text(
         ax,
-        x + w * 0.43,
-        y + h - 1.55,
-        "Computed features:\n- density (%)\n- area (px)\n- vessel length\n- average width\n- connected components",
-        width=23,
-        size=3.65,
+        x + w * 0.53,
+        y + h - 2.75,
+        "Features:\n- density, area\n- vessel length\n- average width\n- components",
+        width=21,
+        size=7.8,
     )
-
-
-def table_text(df: pd.DataFrame) -> str:
-    rows = []
-    for _, row in df.iterrows():
-        rows.append(
-            f"{row['method'].capitalize():8s} Dice {row['avg_dice']:.4f} | "
-            f"IoU {row['avg_iou']:.4f} | F1 {row['avg_f1']:.4f} | "
-            f"Acc {row['avg_accuracy']:.4f} | Time {row['avg_processing_time_sec']:.4f}s"
-        )
-    return "\n".join(rows)
 
 
 def prepare_artifacts():
@@ -327,29 +315,6 @@ def prepare_artifacts():
             "overlay": overlay,
         }
 
-    summary = pd.read_csv(
-        PROJECT_ROOT
-        / "results_test"
-        / "visual_report"
-        / "tables"
-        / "single_easy_method_comparison_table.csv"
-    )
-    best = pd.read_csv(
-        PROJECT_ROOT
-        / "results_test"
-        / "visual_report"
-        / "tables"
-        / "best_method_by_criterion_table.csv"
-    )
-    ranking = pd.read_csv(
-        PROJECT_ROOT
-        / "results_test"
-        / "visual_report"
-        / "tables"
-        / "overall_method_ranking_table.csv"
-    )
-    sample_fig = read_bgr(PROJECT_ROOT / "results_test" / "figures" / "test_1_A_comparison.png")
-
     return {
         "bgr": bgr,
         "rgb": cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB),
@@ -358,19 +323,15 @@ def prepare_artifacts():
         "pre": pre,
         "quality": quality,
         "methods": methods,
-        "summary": summary,
-        "best": best,
-        "ranking": ranking,
-        "sample_fig": sample_fig,
     }
 
 
 def save_full_pipeline():
     data = prepare_artifacts()
-    fig, ax = plt.subplots(figsize=(11.69, 8.27), dpi=360)
+    fig, ax = plt.subplots(figsize=(16, 9), dpi=360)
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
     ax.set_xlim(0.35, 99.65)
-    ax.set_ylim(0.75, 69.65)
+    ax.set_ylim(21.7, 69.65)
     ax.axis("off")
 
     ax.add_patch(Rectangle((0, 66.2), 100, 3.4, facecolor="#0f2a55", edgecolor="none", zorder=0))
@@ -387,7 +348,7 @@ def save_full_pipeline():
     ax.text(
         50,
         67.25,
-        "CLASSICAL DIP PIPELINE - COMPLETE WORKFLOW, BRANCHES, RESULTS, AND PROGRESS SUMMARY",
+        "CLASSICAL DIP PIPELINE - PREPROCESSING, THRESHOLDING, MORPHOLOGY, AND SKELETON FEATURES",
         ha="center",
         va="center",
         fontsize=6.1,
@@ -406,25 +367,25 @@ def save_full_pipeline():
         top_h,
         "1. Dataset (FIVES)",
         "dataset",
-        body="Test split: 200 image pairs\nInput: fundus image\nTarget: manual vessel mask\nROI: field of view",
-        title_size=4.7,
-        body_size=3.6,
+        body="200 test images\nfundus input\nmanual mask\nFOV ROI",
+        title_size=8.6,
+        body_size=7.0,
     )
-    put_image(ax, data["rgb"], xs[0] + 0.6, top_y + 0.65, 4.1, 3.2, "input", "#3f7f2c")
-    put_image(ax, data["gt"], xs[0] + 5.4, top_y + 0.65, 4.1, 3.2, "GT mask", "#3f7f2c")
+    put_image(ax, data["rgb"], xs[0] + 0.55, top_y + 0.75, 4.35, 3.65, "input", "#3f7f2c")
+    put_image(ax, data["gt"], xs[0] + 5.25, top_y + 0.75, 4.35, 3.65, "GT mask", "#3f7f2c")
 
     prep_items = [
-        ("2.1 FOV Mask", data["fov"], "gray threshold\nmorph close/open\nlargest component\nfill holes"),
-        ("2.2 Green Channel", data["pre"]["green"], "extract green\nbest vessel contrast"),
-        ("2.3 CLAHE", data["pre"]["clahe"], "local contrast\nenhancement"),
-        ("2.4 Gaussian", data["pre"]["gaussian"], "noise smoothing\nkernel = 5"),
-        ("2.5 Black-hat", data["pre"]["blackhat"], "dark vessel\nemphasis"),
-        ("2.6 Contrast Stretch", data["pre"]["enhanced"], "normalize inside FOV\nvessel-enhanced image"),
+        ("2.1 FOV\nMask", data["fov"], "retina ROI\nlargest component\nfill holes"),
+        ("2.2 Green\nChannel", data["pre"]["green"], "best vessel\ncontrast"),
+        ("2.3\nCLAHE", data["pre"]["clahe"], "local contrast\nenhancement"),
+        ("2.4\nGaussian", data["pre"]["gaussian"], "noise smoothing\nkernel = 5"),
+        ("2.5\nBlack-hat", data["pre"]["blackhat"], "dark vessel\nemphasis"),
+        ("2.6 Contrast\nStretch", data["pre"]["enhanced"], "normalize FOV\nvessel response"),
     ]
     for idx, (title, image, body) in enumerate(prep_items, start=1):
         x = xs[idx]
-        rounded_box(ax, x, top_y, w, top_h, title, "prep", body=body, title_size=4.5, body_size=3.45)
-        put_image(ax, image, x + 1.2, top_y + 0.75, 7.8, 4.0, title.split(" ", 1)[1], "#245985")
+        rounded_box(ax, x, top_y, w, top_h, title, "prep", body=body, title_size=8.3, body_size=6.8)
+        put_image(ax, image, x + 0.95, top_y + 0.78, 8.3, 4.35, title.replace("\n", " "), "#245985")
 
     mini_hist(
         ax,
@@ -465,151 +426,6 @@ def save_full_pipeline():
         arrow(ax, enhanced_anchor, (x + method_w / 2, branch_y + branch_h), color=color, rad=0.08)
         arrow(ax, (x + method_w / 2, branch_y), (x + method_w / 2, morph_y + morph_h), color=color)
         arrow(ax, (x + method_w / 2, morph_y), (x + method_w / 2, skel_y + skel_h), color=color)
-
-    # Evaluation, performance, and visual comparison.
-    eval_y, eval_h = 12.9, 8.9
-    rounded_box(
-        ax,
-        1.0,
-        eval_y,
-        22.0,
-        eval_h,
-        "6. Evaluation vs Ground Truth",
-        "eval",
-        body="Mask metrics:\nDice, IoU, Precision, Recall, F1, Accuracy\n\nSkeleton metrics:\ncenterline Dice, IoU, F1, pixels, time\n\nFeature errors:\ndensity, area, length, width, components",
-        title_size=4.45,
-        body_size=3.5,
-    )
-    rounded_box(
-        ax,
-        24.4,
-        eval_y,
-        31.0,
-        eval_h,
-        "7. Average Performance over 200 Test Images",
-        "eval",
-        title_size=4.45,
-    )
-    put_text(ax, 25.1, eval_y + eval_h - 1.55, table_text(data["summary"]), width=78, size=3.55)
-    ranking_text = "\n".join(
-        f"Rank {int(r.overall_position)}: {str(r.method).capitalize()} (avg rank {r.average_rank:.4f})"
-        for _, r in data["ranking"].iterrows()
-    )
-    put_text(ax, 25.1, eval_y + 2.0, ranking_text, width=76, size=3.55, weight="bold")
-
-    best_lines = [
-        f"{row['criterion']}: {row['best_method']} ({row['value']:.4f})"
-        for _, row in data["best"].head(10).iterrows()
-    ]
-    rounded_box(
-        ax,
-        56.8,
-        eval_y,
-        16.7,
-        eval_h,
-        "8. Best Result Summary",
-        "eval",
-        body="\n".join(best_lines),
-        title_size=4.45,
-        body_size=3.15,
-    )
-    rounded_box(ax, 74.8, eval_y, 24.2, eval_h, "9. Visual Comparison Sample", "eval", title_size=4.45)
-    put_image(ax, data["sample_fig"], 75.6, eval_y + 0.7, 22.6, 6.55, "image 1_A pipeline comparison", "#a36a00")
-
-    for method, x in method_positions.items():
-        color = METHOD_COLORS[method]
-        arrow(
-            ax,
-            (x + method_w / 2, skel_y),
-            (12.0, eval_y + eval_h),
-            color=color,
-            rad=-0.08,
-            lw=0.55,
-            alpha=0.72,
-        )
-        arrow(
-            ax,
-            (x + method_w / 2, skel_y),
-            (39.0, eval_y + eval_h),
-            color=color,
-            rad=0.0,
-            lw=0.55,
-            alpha=0.72,
-        )
-        arrow(
-            ax,
-            (x + method_w / 2, skel_y),
-            (65.0, eval_y + eval_h),
-            color=color,
-            rad=0.07,
-            lw=0.55,
-            alpha=0.72,
-        )
-        arrow(
-            ax,
-            (x + method_w / 2, skel_y),
-            (87.0, eval_y + eval_h),
-            color=color,
-            rad=0.12,
-            lw=0.55,
-            alpha=0.72,
-        )
-
-    # Bottom: progress, outputs, applications, conclusion.
-    bottom_y, bottom_h = 2.0, 8.9
-    rounded_box(
-        ax,
-        1.0,
-        bottom_y,
-        24.0,
-        bottom_h,
-        "10. What We Completed",
-        "output",
-        body="- Built full classical DIP pipeline\n- Removed edge and watershed parts\n- Kept skeletonization branch\n- Tested Global, Otsu, Adaptive\n- Evaluated all 200 test images\n- Generated masks, skeletons, overlays\n- Built CSV tables, dashboard, notebook, report",
-        title_size=4.5,
-        body_size=3.45,
-    )
-    rounded_box(
-        ax,
-        26.3,
-        bottom_y,
-        23.5,
-        bottom_h,
-        "11. Deliverables",
-        "output",
-        body="- Final binary vessel masks\n- Skeleton maps\n- Overlay error maps\n- Method comparison tables\n- Best-method ranking\n- HTML dashboard\n- Notebook visual figures\n- LaTeX report and PDF",
-        title_size=4.5,
-        body_size=3.45,
-    )
-    rounded_box(
-        ax,
-        51.1,
-        bottom_y,
-        22.5,
-        bottom_h,
-        "12. Why It Matters",
-        "output",
-        body="- Vessel density: amount of vessel area\n- Area: total detected vessel pixels\n- Skeleton length: vessel centerline length\n- Average width: estimated vessel thickness\n- Components: fragmentation/noise measure\n- Overlay: visual FP/FN diagnosis",
-        title_size=4.5,
-        body_size=3.45,
-    )
-    rounded_box(
-        ax,
-        74.9,
-        bottom_y,
-        24.1,
-        bottom_h,
-        "13. Final Decision and Legend",
-        "note",
-        body="Final ranking on this test set:\n1. Global thresholding\n2. Adaptive thresholding\n3. Otsu thresholding\n\nOverlay legend:\nYellow = true positive\nBlue = false positive\nRed = false negative\n\nBranch legend: blue=Global, orange=Otsu, green=Adaptive.",
-        title_size=4.5,
-        body_size=3.45,
-    )
-
-    arrow(ax, (12.5, eval_y), (12.5, bottom_y + bottom_h), color="#1f7a5a")
-    arrow(ax, (39.0, eval_y), (39.0, bottom_y + bottom_h), color="#1f7a5a")
-    arrow(ax, (65.0, eval_y), (65.0, bottom_y + bottom_h), color="#1f7a5a")
-    arrow(ax, (87.0, eval_y), (87.0, bottom_y + bottom_h), color="#64748b")
 
     fig.savefig(ASSET_DIR / "full_pipeline_architecture.png", dpi=360, facecolor="white")
     fig.savefig(ASSET_DIR / "full_pipeline_architecture.pdf", facecolor="white")
